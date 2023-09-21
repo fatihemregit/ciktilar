@@ -1,0 +1,148 @@
+   
+
+LOGCAT
+
+FATAL EXCEPTION: main
+                                                                                                    Process: com.fatih.landmarkbookkotlin, PID: 8624
+                                                                                                    java.lang.RuntimeException: Unable to start activity ComponentInfo{com.fatih.landmarkbookkotlin/com.fatih.landmarkbookkotlin.DetailsActivity}: java.lang.NullPointerException: null cannot be cast to non-null type com.fatih.landmarkbookkotlin.Landmark
+                                                                                                    	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3449)
+                                                                                                    	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3601)
+                                                                                                    	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:85)
+                                                                                                    	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:135)
+                                                                                                    	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:95)
+                                                                                                    	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2066)
+                                                                                                    	at android.os.Handler.dispatchMessage(Handler.java:106)
+                                                                                                    	at android.os.Looper.loop(Looper.java:223)
+                                                                                                    	at android.app.ActivityThread.main(ActivityThread.java:7656)
+                                                                                                    	at java.lang.reflect.Method.invoke(Native Method)
+                                                                                                    	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:592)
+                                                                                                    	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:947)
+                                                                                                    Caused by: java.lang.NullPointerException: null cannot be cast to non-null type com.fatih.landmarkbookkotlin.Landmark
+                                                                                                    	at com.fatih.landmarkbookkotlin.DetailsActivity.onCreate(DetailsActivity.kt:22)
+                                                                                                    	at android.app.Activity.performCreate(Activity.java:8000)
+                                                                                                    	at android.app.Activity.performCreate(Activity.java:7984)
+                                                                                                    	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1309)
+                                                                                                    	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3422)
+                                                                                                    	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3601) 
+                                                                                                    	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:85) 
+                                                                                                    	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:135) 
+                                                                                                    	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:95) 
+                                                                                                    	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2066) 
+                                                                                                    	at android.os.Handler.dispatchMessage(Handler.java:106) 
+                                                                                                    	at android.os.Looper.loop(Looper.java:223) 
+                                                                                                    	at android.app.ActivityThread.main(ActivityThread.java:7656) 
+                                                                                                    	at java.lang.reflect.Method.invoke(Native Method) 
+                                                                                                    	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:592) 
+                                                                                                    	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:947)                 
+
+
+
+
+
+MAİN ACTİVİTY
+
+package com.fatih.landmarkbookkotlin
+
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import com.fatih.landmarkbookkotlin.databinding.ActivityMainBinding
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var landmarkList : ArrayList<Landmark>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        landmarkList = ArrayList<Landmark>()
+
+        //Data
+        val pisa = Landmark("Pisa","Italy",R.drawable.pisa)
+        val colosseum = Landmark("Colosseum","Italy",R.drawable.colosseum)
+        val eiffel = Landmark("Eiffel","France",R.drawable.eiffel)
+        val londonBridge = Landmark("London Bridge","UK",R.drawable.londonbridge)
+        landmarkList.add(pisa)
+        landmarkList.add(colosseum)
+        landmarkList.add(eiffel)
+        landmarkList.add(londonBridge)
+        //Adapter: Layout & Data
+        val adapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,landmarkList.map {landmark -> landmark.name })
+        binding.listView.adapter = adapter
+        binding.listView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
+            val intent = Intent(this@MainActivity,DetailsActivity::class.java)
+            intent.putExtra("landmark",landmarkList.get(i))
+            startActivity(intent)
+
+        }
+    }
+}
+
+
+
+
+DETAİLSACTİVİTY
+package com.fatih.landmarkbookkotlin
+
+import android.content.Intent
+import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import com.fatih.landmarkbookkotlin.databinding.ActivityDetailsBinding
+import com.fatih.landmarkbookkotlin.databinding.ActivityMainBinding
+
+class DetailsActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityDetailsBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityDetailsBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        val intent = Intent()
+        val landmark:Landmark = if(Build.VERSION.SDK_INT >=33){intent.getSerializableExtra("landmark",Landmark::class.java)!!}
+        else{intent.getSerializableExtra("landmark") as Landmark}
+        binding.nameText.text = landmark.name
+        binding.countryText.text = landmark.country
+        binding.imageView.setImageResource(landmark.image)
+
+    }
+}
+manifest.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LandmarkBookKotlin"
+        tools:targetApi="31">
+        <activity
+            android:name=".DetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
